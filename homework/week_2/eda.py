@@ -57,7 +57,7 @@ def get_information_boxplot(data_frame):
 def boxplot(data_frame):
     plt.figure(figsize=(10,8))
     bp1 = plt.boxplot(data_frame['Infant_Mortality'], positions=[1], notch=True, patch_artist=True)
-    plt.ylabel('Frequency', color='black')
+    plt.ylabel('Number of indivduals')
     plt.title('Infant mortality per 1000 births')
     plt.show()
 
