@@ -66,7 +66,7 @@ def plot(data_frame):
     data_frame.hist(column='GDP', bins=50, grid=False, figsize=(10,8), color='#86bf91', zorder=2, rwidth=0.9)
     plt.ylabel('Frequency', color='black')
     plt.xlabel('GDP in $ (per capita)', color='black')
-    plt.title('Distribution of GDP', color='black')
+    plt.title('Distribution of GDP of 214 countries', color='black')
     plt.show()
 
 # In this function we create a JSON file named outfile
