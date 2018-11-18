@@ -7,11 +7,11 @@ INPUT_CSV = "MoMAExhibitions1929to1989.csv"
 def organize_data():
     read_data = pd.read_csv("MoMAExhibitions1929to1989.csv")
     data_frame = pd.DataFrame(read_data)
-    data_frame = data_frame[['ExhibitionID', 'ExhibitionTitle', 'ExhibitionBeginDate', 'ExhibitionURL', 'DisplayName', 'Nationality', 'Gender']]
-    data_frame = data_frame.drop_duplicates(subset=['ExhibitionID'])
-    data_frame = data_frame.set_index('ExhibitionID')
+    data_frame = data_frame[['ExhibitionTitle', 'ExhibitionBeginDate', 'ExhibitionURL', 'DisplayName', 'Nationality', 'Gender']]
+    data_frame = data_frame.drop_duplicates(subset=['ExhibitionTitle'])
+    data_frame = data_frame.set_index('ExhibitionTitle')
     data_frame = data_frame.dropna()
-    data_frame = data_frame[data_frame.ExhibitionTitle != 'no data']
+    # data_frame = data_frame[data_frame.ExhibitionTitle != 'no data']
     data_frame = data_frame[data_frame.ExhibitionBeginDate != 'no data']
     data_frame = data_frame[data_frame.ExhibitionURL != 'no data']
     data_frame = data_frame[data_frame.DisplayName != 'no data']
