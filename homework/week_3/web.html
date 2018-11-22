@@ -160,6 +160,7 @@ function merger(){
   return finalXY, finalXYF
 }
 
+
 // In this function we draw everything we need for the line chart
 // and we add text where necessary
 function draw(){
@@ -184,10 +185,10 @@ function draw(){
 
   }
 
-
   ctx.font="15px Georgia";
   ctx.fillStyle = '#00a3f4';
   ctx.fillText("Percentage of female exhibitors in the years 1929-1989 in the Museum of Modern Art New York.",130,60);
+
 
   ctx.font="15px Georgia";
   ctx.fillStyle = 'black';
@@ -198,14 +199,23 @@ function draw(){
   ctx.fillStyle = 'black';
   ctx.fillText("Created by: Bente de Bruin",950,500);
 
+
   ctx.font="15px Georgia";
   ctx.fillStyle = 'black';
   ctx.fillText("Assignment: JavaScript Intro",950,530);
 
 
+  ctx.save();
+  ctx.translate(-667, 800);
+  ctx.rotate(-1);
+  ctx.font="14px Georgia";
+  ctx.fillStyle = 'black';
+  ctx.fillText("Percentage %",630,400);
+  ctx.restore();
+
   ctx.beginPath();
-      ctx.moveTo(finalXYF[0]["key"], finalXYF[0]["VALUE"]);
-      finalXYF.forEach(function(pair){
+  ctx.moveTo(finalXYF[0]["key"], finalXYF[0]["VALUE"]);
+  finalXYF.forEach(function(pair){
         ctx.lineTo(pair["key"], pair["value"]);
         ctx.moveTo(pair["key"], pair["value"]);
       });
@@ -213,10 +223,6 @@ function draw(){
       ctx.stroke();
     };
 
-    ctx.font="15px Georgia";
-    ctx.fillStyle = 'black';
-    ctx.rotate(Math.PI/2);
-    ctx.fillText("Percentage %",430,680);
 
 </script>
 </body>
