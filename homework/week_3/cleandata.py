@@ -8,8 +8,6 @@ INPUT_CSV = "MoMAExhibitions1929to1989.csv"
 def organize_data():
     data_frame = pd.read_csv("MoMAExhibitions1929to1989.csv", encoding='utf-8')
     data_frame = data_frame[['ExhibitionTitle', 'ExhibitionBeginDate', 'ExhibitionURL', 'DisplayName', 'Nationality', 'Gender']]
-    # data_frame = data_frame.drop_duplicates(subset=['ExhibitionTitle'])
-    # data_frame = data_frame.set_index('ExhibitionTitle')
     data_frame = data_frame.dropna()
     data_frame.ExhibitionBeginDate = data_frame.ExhibitionBeginDate.str.split('\/')
     for date in data_frame.ExhibitionBeginDate:
@@ -44,5 +42,4 @@ def toCSV(organized):
 if __name__ == '__main__':
     organize_data()
     toCSV(organized)
-    # toJSON("cleanedCSV.csv")
     organized.to_json('outfile.json', orient='index')
