@@ -1,0 +1,227 @@
+<!--
+  name: Bente de Bruin
+  student number: 11017503
+  purpose of the file: weeknognie
+  -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bente's webpage</title>
+</head>
+<body>
+<h1 style = "color: #000000;">Where are the women?</h1>
+<a href="https://data.world/moma/exhibitions/workspace/file?filename=MoMAExhibitions1929to1989.csv">Click this link to view the datasource which was used for this line chart</a>
+<canvas id="myCanvas" width  = 1500; height = 1500;>
+</canvas>
+<script>
+
+
+  var fileName = "outfile.json";
+  var txtFile = new XMLHttpRequest();
+  txtFile.onreadystatechange = function() {
+  if (txtFile.readyState === 4 && txtFile.status == 200) {
+      logData(JSON.parse(txtFile.responseText));
+      console.log(domainForY());
+      console.log(domainForX());
+      console.log(rangeForY());
+      console.log(rangeForX());
+      calcCoordX();
+      calcCoordY();
+      merger();
+      draw();
+  };
+};
+
+txtFile.open("GET", fileName);
+txtFile.send();
+
+// This is a function in which we organize our data, put it in arrays so that we can use it later on
+function logData(data){
+  dataMale = data['Male'];
+  dataFemale = data['Female'];
+  percMale = Object.values(dataMale);
+  percFemale = Object.values(dataFemale);
+  yearsMale = Object.keys(dataMale);
+  years = [];
+  yearPercMale = [];
+  yearPercFemale = [];
+
+  yearsMale.forEach(function printValues(yearsMale){
+      years.push(yearsMale)
+  });
+
+  percMale.forEach(function printValues(percMale){
+    yearPercMale.push(percMale)
+  });
+
+  percFemale.forEach(function printValues(percFemale){
+    yearPercFemale.push(percFemale)
+  })
+};
+
+
+// In the functions below, we calculate the domains and the ranges
+// We store these two values in an array so that we can transform these values later
+function domainForY(){
+  domainY = [];
+  domainY.push(Math.min(...yearPercFemale));
+  domainY.push(Math.max(...yearPercMale));
+  return domainY
+};
+
+
+function domainForX(){
+  domainX = [];
+  domainX.push(years[0]);
+  domainX.push(years[years.length-1]);
+  return domainX
+};
+
+
+function rangeForY(){
+  rangeY = [];
+  rangeY.push(0);
+  rangeY.push(500);
+  return rangeY
+};
+
+
+function rangeForX(){
+  rangeX = [];
+  rangeX.push(0);
+  rangeX.push(820);
+  return rangeX
+};
+
+
+function createTransform(domain, range){
+
+    var domain_min = domain[0]
+    var domain_max = domain[1]
+    var range_min = range[0]
+    var range_max = range[1]
+
+
+   	var alpha = (range_max - range_min) / (domain_max - domain_min)
+    var beta = range_max - alpha * domain_max
+
+
+    return function(x){
+      return alpha * x + beta;
+    }
+
+}
+// In the functions below, we calculate the coordinates for every x and y value
+// We store these values in an array so that we can draw the line later
+function calcCoordX(){
+  finalX = [];
+  finalXF = [];
+  transformFunctionX = createTransform(domainX, rangeX);
+  for (var c = 0; c < years.length; c++){
+    finalX.push(transformFunctionX(years[c]));
+    finalXF.push(transformFunctionX(years[c])+ 60);
+  }
+  return finalX, finalXF
+}
+
+function calcCoordY(){
+  finalY = [];
+  finalYF = [];
+  transformFunctionY = createTransform(domainY, rangeY);
+  for (var c = 0; c < yearPercMale.length; c++){
+    finalY.push(transformFunctionY(yearPercMale[c]));
+  }
+  for (var d = 0; d < yearPercFemale.length; d++){
+    finalYF.push(transformFunctionY(yearPercFemale[d])- 100);
+  }
+  return finalY, finalYF
+}
+
+// In this function we merge the X and Y values,
+// so that we have a complete coordinate for the line chart
+function merger(){
+  finalXY = [];
+  finalXYF = [];
+  max = rangeY[1];
+  for (var i = 0; i < years.length; i++){
+    finalXY.push({
+      key: finalX[i],
+      value: max-(finalY[i])
+    });
+  }
+  for (var j = 0; j < years.length; j++){
+    finalXYF.push({
+      key: finalXF[j],
+      value: max-(finalYF[j])
+    });
+  }
+  return finalXY, finalXYF
+}
+
+// In this function we draw everything we need for the line chart
+// and we add text where necessary
+function draw(){
+  var canvas = document.getElementById('myCanvas');
+  var ctx = canvas.getContext('2d');
+  void ctx.strokeRect(60, 100, 820, 500);
+
+
+      yearsXAxis = ['1929', '1935', '1941', '1947', '1953', '1959', '1965', '1971', '1977', '1983', '1989'];
+      count = 60;
+  for (var i = 0; i < yearsXAxis.length; i++){
+      ctx.fillText(yearsXAxis[i],count,630);
+      ctx.font="12px Georgia";
+      count += 80;
+  }
+
+  valuesYAxis = ['100', '50', '0'];
+  countTwo = 100;
+  for (var j = 0; j < valuesYAxis.length; j++){
+    ctx.fillText(valuesYAxis[j], 35, countTwo);
+    countTwo += 250;
+
+  }
+
+
+  ctx.font="15px Georgia";
+  ctx.fillStyle = '#00a3f4';
+  ctx.fillText("Percentage of female exhibitors in the years 1929-1989 in the Museum of Modern Art New York.",130,60);
+
+  ctx.font="15px Georgia";
+  ctx.fillStyle = 'black';
+  ctx.fillText("Years",430,680);
+
+
+  ctx.font="15px Georgia";
+  ctx.fillStyle = 'black';
+  ctx.fillText("Created by: Bente de Bruin",950,500);
+
+  ctx.font="15px Georgia";
+  ctx.fillStyle = 'black';
+  ctx.fillText("Studentnumber: 11017503",950,530);
+
+  ctx.font="15px Georgia";
+  ctx.fillStyle = 'black';
+  ctx.fillText("Studentnumber: 11017503",950,530);
+
+
+  ctx.beginPath();
+      ctx.moveTo(finalXYF[0]["key"], finalXYF[0]["VALUE"]);
+      finalXYF.forEach(function(pair){
+        ctx.lineTo(pair["key"], pair["value"]);
+        ctx.moveTo(pair["key"], pair["value"]);
+      });
+      ctx.strokeStyle = '#00a3f4';
+      ctx.stroke();
+    };
+
+    ctx.font="15px Georgia";
+    ctx.fillStyle = 'black';
+    ctx.rotate(Math.PI/2);
+    ctx.fillText("Percentage %",430,680);
+
+</script>
+</body>
+</html>
