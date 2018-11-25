@@ -1,0 +1,15 @@
+body {
+    background-color: lightblue;
+}
+
+p {
+  font-family: Helvetica;
+  color: black;
+  font-size: 15px;
+}
+
+h1 {
+  font-family: Helvetica;
+  color: black;
+  font-size: 30px;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <link rel="stylesheet" href="style.css">
+        <meta charset="utf-8">
+        <title>Meat consumption</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+          var fileName = "outfile.json";
+          var txtFile = new XMLHttpRequest();
+          txtFile.onreadystatechange = function() {
+          if (txtFile.readyState === 4 && txtFile.status == 200) {
+          dataset = JSON.parse(txtFile.responseText);
+          //console.log(dataset)
+          d3.json(dataset, function(error, data){
+            d3.select("body").selectAll("p")
+              .data(dataset)
+              .enter()
+              .append("p")
+              .text("New paragraph!");
+          })
+      }
+  }
+  txtFile.open("GET", fileName);
+  txtFile.send();
+
+
+          d3.select("body").append("h1").text("Beef and veal consumption in n different countries");
+          d3.select("body").append("p").text("Bente de Bruin");
+          d3.select("body").append("p").text("Dataprocessing: D3 Barchart");
+          d3.select("body").append("p").text("This is a visualization of the beef and veal consumption in kg per capita for the year 2017.");
+          d3.select("body").selectAll("p")
+
+            // Your beautiful D3 code will go here
+        </script>
+    </body>
+</html>
