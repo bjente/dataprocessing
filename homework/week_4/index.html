@@ -9,32 +9,162 @@
     <body>
         <script type="text/javascript">
 
-          var fileName = "outfile.json";
-          var txtFile = new XMLHttpRequest();
-          txtFile.onreadystatechange = function() {
-          if (txtFile.readyState === 4 && txtFile.status == 200) {
-          dataset = JSON.parse(txtFile.responseText);
-          //console.log(dataset)
-          d3.json(dataset, function(error, data){
-            d3.select("body").selectAll("p")
-              .data(dataset)
-              .enter()
-              .append("p")
-              .text("New paragraph!");
-          })
-      }
-  }
-  txtFile.open("GET", fileName);
-  txtFile.send();
+        d3.json("outfile.json")
+          .then(function(data){
+
+            keys = Object.keys(data);
+            values = Object.values(data);
+            var barPadding = 1;
+
+            d3.select("body").append("h2").text("Beef and veal consumption in 46 different countries")
+              .style("color", "teal");
+            d3.select("body").append("p").text("This is a barchart made by: Bente de Bruin")
+              .style("color", "teal");
+            d3.select("body").append("p").text("Studentnumber: 11017503")
+              .style("color", "teal");
+            d3.select("body").append("p").text("This barchart illustrates the beef and veal consumption in KG per capita in the year 2017 for 46 different countries or areas")
+              .style("color", "teal");
+            d3.select("body").append("p").text("Hover over the bars with your mouse to see the exact values")
+              .style("color", "teal");
+
+            //Creation of svg
+            var margin = {top: 20, right: 3, bottom: 20, left:50},
+                w = 1500 - margin.right - margin.left,
+                h = 500 - margin.top - margin.bottom;
+
+            var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w + margin.right + margin.left)
+            .attr("height", h + margin.top + margin.bottom)
+            .append("g")
+              .attr("transform","translate(" + margin.left + "," + margin.right + ")");
 
 
-          d3.select("body").append("h1").text("Beef and veal consumption in n different countries");
-          d3.select("body").append("p").text("Bente de Bruin");
-          d3.select("body").append("p").text("Dataprocessing: D3 Barchart");
-          d3.select("body").append("p").text("This is a visualization of the beef and veal consumption in kg per capita for the year 2017.");
-          d3.select("body").selectAll("p")
+            //Calculate scale for both the x- and y-axis which we will use for the creation of the axes
+            var yScale = d3.scaleLinear()
+            .range([(h), margin.top]).clamp(true)
+            .domain([0, 45]);
 
-            // Your beautiful D3 code will go here
-        </script>
+            var xScale = d3.scaleLinear()
+              .range([0, w - margin.right])
+              .domain([0, 80]);
+
+
+            // Below we create the rects, aka the bars for the barchart
+            svg.selectAll("rect")
+               .data(values)
+               .enter()
+               .append("rect")
+               .attr("x", function(d, i) {
+                return i * (w / values.length);
+              })
+               .attr("width", w / values.length - barPadding)
+               .attr("y", function(d) {
+                return yScale(d.Value);  //Height minus data value
+               })
+               .attr("height", function(d) {
+                return h - yScale(d.Value);  //Just the data value
+              })
+              .attr("fill", function(d) {
+                return "rgb(500, 500, " + (d.Value * 10) + ")";
+              })
+
+
+              //Below we make sure the value appears if the user hovers over a bar with his/her mouse
+              //also, the color of the bar changes when the user hovers over a bar
+              .on("mouseover", function(){
+                d3.select(this)
+                .attr("fill", function(d) {
+                  return "rgb(0, 0, " + (d.Value * 10) + ")";
+                  })
+                tooltip.style("display", null);
+
+              })
+
+              .on("mouseout", function(){
+                d3.select(this)
+                  .attr("fill", function(d) {
+                    return "rgb(500, 500, " + (d.Value * 10) + ")";
+                  })
+                tooltip.style("display", "none");
+
+              })
+
+              .on("mousemove", function(d){
+
+                var xPos = d3.mouse(this)[0] - 15;
+                var yPos = d3.mouse(this)[1] - 55;
+                tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
+                tooltip.select("text").text(d.Value + " " + "Kilogram")
+                .attr("fill", "red")
+              });
+
+
+            //The tooltip is created
+            //Got the code with the help of this tutorial: https://www.youtube.com/watch?v=wsCOif7RMBo
+            var tooltip = svg.append("g")
+                .attr("class", "tooltip")
+                .style("display", "none");
+
+            tooltip.append("text")
+                  .attr("x", 15)
+                  .attr("dy", "1.2em")
+                  .style("font-size", "1.25em")
+                  .attr("font-weight", "bold");
+
+
+              //Below, we create labels for the bars.
+              //The labels are the countries with their corresponding bar
+              svg.selectAll("barLabel")
+                 .data(keys)
+                 .enter()
+                 .append("text")
+                 .text(function(d) {
+                  return d;
+                  })
+                 .attr("font-size", "10px")
+                 .attr("class", "barLabel")
+                 .attr("x", function(d, i) {
+                  return i * (w / keys.length) + (w / keys.length - barPadding) / 20;
+                  })
+                  .attr("y", 470)
+
+
+                //Creation of x- and y-axis according to their scale
+                var xAxis = d3.axisBottom()
+                  .scale(xScale)
+                  .ticks(0);
+
+                var yAxis = d3.axisLeft()
+                    .scale(yScale)
+
+                svg.append("g")
+                    .call(yAxis)
+
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - barPadding) + ")")
+                    .call(xAxis)
+
+
+                //Below we create labels for the x- and y-axis
+                svg.append("text")
+                    .attr("transform",
+                          "translate(" + (w/2) + " ," +
+                                         (h + margin.top + 10) + ")")
+                    .style("text-anchor", "middle")
+                    .text("Country");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x",0 - (h / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .text("Beef and veal consumed in KG");
+
+
+  });
+      </script>
     </body>
 </html>

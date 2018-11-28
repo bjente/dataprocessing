@@ -13,3 +13,14 @@ h1 {
   color: black;
   font-size: 30px;
 }
+
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 400px;   
+    background-color: teal;
+}
+
+.tooltip {
+  text-decoration: underline;
+}
