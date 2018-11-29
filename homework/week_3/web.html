@@ -23,10 +23,6 @@
   txtFile.onreadystatechange = function() {
   if (txtFile.readyState === 4 && txtFile.status == 200) {
       logData(JSON.parse(txtFile.responseText));
-      console.log(domainForY());
-      console.log(domainForX());
-      console.log(rangeForY());
-      console.log(rangeForX());
       calcCoordX();
       calcCoordY();
       merger();
