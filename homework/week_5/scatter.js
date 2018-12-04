@@ -5,31 +5,36 @@
 
 
 window.onload = function() {
-  var set1 = "alcohol.json"
-  var set2 = "tabak.json"
-  var set3 = "obesitas.json"
+  var set1 = "https://raw.githubusercontent.com/bjente/dataprocessing/master/homework/week_5/alcohol.json"
+  var set2 = "https://raw.githubusercontent.com/bjente/dataprocessing/master/homework/week_5/tabak.json"
+  var set3 = "https://raw.githubusercontent.com/bjente/dataprocessing/master/homework/week_5/obesitas.json"
   var requests = [d3.json(set1), d3.json(set2), d3.json(set3)];
   Promise.all(requests).then(function(response) {
-      // console.log(response)
     var alc = response[0]
+    console.log(alc)
     var tab = response[1]
+    console.log(tab)
     var obe = response[2]
-
+    console.log(obe)
 
     keysAlc = Object.keys(alc)
+    console.log(keysAlc)
     keysTab = Object.keys(tab)
     keysObe = Object.keys(obe)
     alcValues = makeArray(alc, keysAlc)
+    console.log(alcValues)
     maxAlc = Math.max.apply(null, alcValues)
     minAlc = Math.min.apply(null, alcValues)
     tabValues = makeArray(tab, keysTab)
     maxTab = Math.max.apply(null, tabValues)
     minTab = Math.min.apply(null, tabValues)
     obeValues = makeArray(obe, keysObe)
+    console.log(obeValues)
     maxObe = Math.max.apply(null, obeValues)
     minObe = Math.min.apply(null, obeValues)
     alcTab = createCoordinates(tabValues, alcValues)
     alcObe = createCoordinates(alcValues, obeValues)
+    console.log(alcObe)
     tobObe = createCoordinates(tabValues, obeValues)
     valuesScatter = makeGraph(minAlc, maxAlc, minObe, maxObe, alcObe)
     makeScatter(valuesScatter[0], valuesScatter[1], valuesScatter[2], valuesScatter[3], alcObe, keysAlc)
