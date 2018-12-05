@@ -10,34 +10,34 @@ window.onload = function() {
   var set3 = "https://raw.githubusercontent.com/bjente/dataprocessing/master/homework/week_5/obesitas.json"
   var requests = [d3.json(set1), d3.json(set2), d3.json(set3)];
   Promise.all(requests).then(function(response) {
-    var alc = response[0]
-    console.log(alc)
-    var tab = response[1]
-    console.log(tab)
-    var obe = response[2]
-    console.log(obe)
 
+    var alc = response[0]
+    var tab = response[1]
+    var obe = response[2]
     keysAlc = Object.keys(alc)
-    console.log(keysAlc)
     keysTab = Object.keys(tab)
     keysObe = Object.keys(obe)
     alcValues = makeArray(alc, keysAlc)
-    console.log(alcValues)
     maxAlc = Math.max.apply(null, alcValues)
     minAlc = Math.min.apply(null, alcValues)
     tabValues = makeArray(tab, keysTab)
     maxTab = Math.max.apply(null, tabValues)
     minTab = Math.min.apply(null, tabValues)
     obeValues = makeArray(obe, keysObe)
-    console.log(obeValues)
     maxObe = Math.max.apply(null, obeValues)
     minObe = Math.min.apply(null, obeValues)
-    alcTab = createCoordinates(tabValues, alcValues)
     alcObe = createCoordinates(alcValues, obeValues)
-    console.log(alcObe)
     tobObe = createCoordinates(tabValues, obeValues)
+    makeDropdown(changeFunction)
     valuesScatter = makeGraph(minAlc, maxAlc, minObe, maxObe, alcObe)
-    makeScatter(valuesScatter[0], valuesScatter[1], valuesScatter[2], valuesScatter[3], alcObe, keysAlc)
+    alcDict = makeDict(alc, keysAlc)
+    changeFunction(alcObe, tobObe, maxAlc, maxObe, maxTab)
+    european = ["AUT", "CAN", "CZE", "FIN", "FRA", "GRC", "HUN", "ITA", "LUX", "NLD", "POL", "PRT", "SVK", "ESP", "SWE", "EST", "SVN", "LVA"]
+    nonEuropean = ["KOR", "TUR", "USA", "ISR"]
+    countries = makeCountries(alcDict)
+    makeScatter(valuesScatter[0], valuesScatter[1], valuesScatter[2], valuesScatter[3], alcObe, keysAlc, countries, european)
+    makeLegend(valuesScatter[2])
+
 
   }).catch(function(e){
       throw(e);
@@ -47,8 +47,8 @@ window.onload = function() {
 
 var margin = {top: 10, right: 20, bottom: 20, left: 20},
   padding = {top: 10, right: 60, bottom: 60, left: 20},
-  outerWidth = 1000,
-  outerHeight = 800,
+  outerWidth = 950,
+  outerHeight = 750,
   innerWidth = outerWidth - margin.left - margin.right,
   innerHeight = outerHeight - margin.top - margin.bottom,
   width = innerWidth - padding.left - padding.right,
@@ -72,7 +72,23 @@ function createCoordinates(array1, array2) {
       return output
 }
 
+function makeDict(data, keys) {
+      output = []
+      keys.forEach(function(key){
+        output.push((data[key]))
+      });
+      return output
+}
 
+function makeCountries(alcDict)  {
+      var countries = []
+      for (i = 0; i < alcDict.length; i++){
+        countries.push(alcDict[i].LOCATION)
+      }
+      return countries
+}
+
+// In the function below, we create the svg on which we can make the scatterplot
 function makeGraph(minX, maxX, minY, maxY, alcObe){
 
     var xScale = d3.scaleLinear()
@@ -87,7 +103,7 @@ function makeGraph(minX, maxX, minY, maxY, alcObe){
       var yAxis = d3.axisLeft(yScale);
 
 
-      var svg = d3.select("body").append("svg")
+      var svg = d3.select("#choices").append("svg")
                   .attr("width", outerWidth)
                   .attr("height", outerHeight)
                   .append("g")
@@ -121,15 +137,14 @@ function makeGraph(minX, maxX, minY, maxY, alcObe){
                   .style("text-anchor", "middle")
                   .text("Self-reported obesitas in % of population aged 15+ in 2014");
 
-
   return [xScale, yScale, svg, g];
-
-
 }
 
-function makeScatter(xScale, yScale, svg, g, alcObe, keysAlc){
-  var cValue = function(d) { return d;},
-      color = d3.scaleOrdinal(d3.schemeCategory10);
+// In the function below, we create the scatterplot
+function makeScatter(xScale, yScale, svg, g, alcObe, keysAlc, countries, european){
+  var gdots = svg.selectAll("g.dot")
+      .data(alcObe)
+      .enter().append("g")
 
   svg.selectAll("circle")
          .data(alcObe)
@@ -138,8 +153,14 @@ function makeScatter(xScale, yScale, svg, g, alcObe, keysAlc){
          .attr("cx", function(d) {
             return xScale(d[0])
          })
-         //.attr('fill', '#ff0000')
-         .style("fill", function(d) { return color(cValue(d));})
+         .style("fill", function(d, i) {
+           if (european.includes(countries[i])) {
+             return "red"
+           } else {
+             return "blue"
+           }
+         })
+
          .attr('fill-opacity', 0.6)
          .attr("cy", function(d) {
             return yScale(d[1]) + margin.top;
@@ -148,39 +169,128 @@ function makeScatter(xScale, yScale, svg, g, alcObe, keysAlc){
             return d[1]/8
     })
 
-  svg.append("text")
-   .data(alcObe)
-   .enter()
-   .append("text")
-   .text(function(d) {
-        return d;
-   })
-   .attr("x", function(d) {
-        return xScale(d[0]);
-   })
-   .attr("y", function(d) {
-        return yScale(d[1]);
-   })
-   .attr("fill", "red");
 
+        .on("mouseover", function(){
+          d3.select(this)
+          .attr('fill-opacity', 1);
+          tooltip.style("display", null)
+
+        })
+
+        .on("mouseout", function(){
+          d3.select(this)
+          .attr('fill-opacity', 0.6)
+          tooltip.style("display", "none")
+
+        })
+
+        .on("mousemove", function(d){
+          var xPos = d3.mouse(this)[0] - 45;
+          var yPos = d3.mouse(this)[1] - 40;
+          tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
+          tooltip.select("text").text(d[0] + ", " + d[1])
+          .attr("fill", "green")
+        })
+
+
+        //The tooltip is created
+        //Got the code with the help of this tutorial: https://www.youtube.com/watch?v=wsCOif7RMBo
+        var tooltip = svg.append("g")
+            .attr("class", "tooltip")
+            .style("display", "none");
+
+        tooltip.append("text")
+              .attr("x", 15)
+              .attr("dy", "1.2em")
+              .style("font-size", "1em")
+              .attr("font-weight", "bold");
+
+    // Below, we make sure that the country is written at it's corresponding circle
+    gdots.append("text").text(function(d, i){
+        return countries[i]
+    })
+        .attr("x", function(d){
+          return xScale(d[0])
+        })
+        .attr("y", function(d){
+          return yScale(d[1] - 1.6)
+        })
+        .attr("font-size", "10px")
+    }
+
+
+function makeLegend(svg){
+  euNonEu = ['European', 'Non-European']
+
+  // Below we draw the legend
+  var legend = svg.selectAll(".legend")
+      .data(euNonEu)
+      .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      // Below, we draw the legend colored circles
+      legend.append("circle")
+          .attr("cx", width - 9)
+          .attr("cy", 10.5)
+          .attr("r", 7)
+          .style("fill", function(d, i) {
+            if (i == 0) {
+              return "red"
+            } else {
+              return "blue"
+            }
+          })
+          .attr('fill-opacity', 0.6)
+
+      // Below, we create the text for a legend
+      legend.append("text")
+          .attr("x", width - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d;})
 }
 
 
+function makeDropdown(alcObe, tobObe, maxAlc, maxObe, maxTab) {
 
-//
-// function makeScatter(data){
-//
-//   let graphDimensions {
-//     w: ""
-//     h: ""
-//     padding:
-//
-//   let margin {
-//     top: ""
-//     right: ""
-//     bottom: ""
-//     left: ""
-//   }
-//
-//   }
-// }
+  // Below, we create a dropdown menu
+  var dropdown = d3.select("#choices");
+
+  var dropdownChoices = ["Correlation between alcohol consumption and obesity", "Correlation between tobacco consumption and obesity"]
+
+  selectBox = dropdown
+  .append("select")
+  .attr("id", "selectBox")
+  .on("change", changeFunction)
+
+  selectBox.selectAll("option")
+      .data(dropdownChoices)
+      .enter()
+      .append("option")
+      .attr("value", function(d){
+          return d;
+      })
+      .text(function(d){
+          return d;
+      })
+      .attr("onclick", function(d){
+      });
+      var selectBox = document.getElementById("selectBox")
+      var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+
+}
+
+// Below, I TRIED to make my scatter plot change based upon the input of the dropdown menu, but unfortanely I didn't succeed.
+// I don't understand why I can't acces the values of alcObe and TobObe.
+// If I log these values, they only get logged in the first if statement ONCE, after that they are logged as undefined.
+changeFunction = function(alcObe, tobObe, maxAlc, maxObe, maxTab) {
+  var selectBox = document.getElementById("selectBox");
+  var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+  if (selectedValue.includes('Correlation between alcohol consumption and obesity')){
+    return[alcObe, maxAlc, maxObe]
+} else if (selectedValue.includes('Correlation between tobacco consumption and obesity')){
+  return[tobObe, maxTab, maxObe]
+}
+}
