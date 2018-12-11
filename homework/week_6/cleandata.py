@@ -6,7 +6,8 @@ INPUT_CSV = "happiness.csv"
 
 def organize_data():
     data_frame = pd.read_csv(INPUT_CSV, encoding='utf-8')
-    data_frame = data_frame.drop(columns=["Whisker.high", "Whisker.low", "Dystopia.Residual"])
+    data_frame = data_frame.drop(columns=["Happiness.Rank", "Whisker.high", "Whisker.low", "Dystopia.Residual"])
+    data_frame = data_frame.rename(index=str, columns={"Happiness.Score": "Score", "Economy..GDP.per.Capita": "Economy", "Health..Life.Expectancy.": "Health", "Trust..Government.Corruption.": "Trust"})
     data_frame = data_frame.dropna()
     data_frame = data_frame.reset_index(drop=True)
     return data_frame
