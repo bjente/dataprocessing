@@ -4,7 +4,7 @@
 
 
 window.onload = function() {
-    var set1 = "https://raw.githubusercontent.com/bjente/dataprocessing/master/homework/week_6/happiness.json"
+    var set1 = "happiness.json"
     var requests = [d3.json(set1)];
     Promise.all(requests).then(function(response) {
 
@@ -12,7 +12,6 @@ window.onload = function() {
       keysHap = Object.keys(hap)
       valuesHap = Object.values(hap)
       console.log(keysHap)
-      countries = []
     })
     .catch(function(e){
         throw(e);
@@ -32,7 +31,7 @@ var margin = {top: 10, right: 20, bottom: 20, left: 20},
 function makeArray(data, keys)  {
       var array = []
       keys.forEach(function(key){
-        array.push((data[key]).Value)
+        array.push((data[key]).Score)
       });
       return array
 }
