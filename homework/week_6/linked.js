@@ -11,7 +11,8 @@ window.onload = function() {
       var hap = response[0]
       keysHap = Object.keys(hap)
       valuesHap = Object.values(hap)
-      console.log(valuesHap.Score)
+      console.log(keysHap)
+      countries = []
     })
     .catch(function(e){
         throw(e);
