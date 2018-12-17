@@ -1,15 +1,52 @@
 body {
-  background-color: #ffe993;
+  background-color: #a6b1c1;
 }
 
 h1 {
   font-family: helvetica;
-  color: #7f6e2d;
+  color: #000000;
   font-size: 20px;
 }
 
 p {
   font-family: helvetica;
-  color: #7f6e2d;
+  color: #000000;
   font-size: 15px;
 }
+
+.d3-tip {
+      line-height: 1;
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+      box-sizing: border-box;
+      display: inline;
+      font-size: 10px;
+      width: 100%;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.8);
+      content: "\25BC";
+      position: absolute;
+      text-align: center;
+    }
+
+    /* Style northward tooltips specifically */
+    .d3-tip.n:after {
+      margin: -2px 0 0 0;
+      top: 100%;
+      left: 0;
+    }
+
+    .bar:hover {
+      fill: pink;
+}
+
+  /* .legend {
+  fill:white;
+  stroke:black;} */
