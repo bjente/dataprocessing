@@ -173,6 +173,7 @@ function makeBars(countries, maxY, happyDict){
                  .on('mouseout', tool_tip.hide)
                  .attr("height", function(d) { return height - yScale(d.value) + margin.top; })
 
+                 // Below we create a nice animation for the bars of the bar chart when the page is loaded.
                  .attr("height", 0)
           			 .transition()
           			 .duration(50)
