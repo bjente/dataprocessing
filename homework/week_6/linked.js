@@ -25,6 +25,7 @@ window.onload = function() {
     })
   };
 
+// We create the margin for the svg
 var margin = {top: 10, right: 20, bottom: 60, left: 20},
   padding = {top: 10, right: 60, bottom: 80, left: 20},
   outerWidth = 1500,
@@ -34,7 +35,7 @@ var margin = {top: 10, right: 20, bottom: 60, left: 20},
   width = innerWidth - padding.left - padding.right,
   height = innerHeight - padding.top - padding.bottom;
 
-
+// We make a dictionary of the countries with their corresponding Happiness Score, which we will use in the makeBars function
 function makeDict(data)  {
       var dict = []
       for (score in data){
@@ -46,7 +47,7 @@ function makeDict(data)  {
     return dict
     }
 
-
+// We make a list of all the Happiness Scores, for calculation of the maximum Y value.
 function makeArray(data) {
   values = []
   for (score in data){
@@ -55,7 +56,7 @@ function makeArray(data) {
   return values
 }
 
-
+// We make an array of all existing countries in the json file.
 function makeCountries(happyDict) {
   countries = []
   for (country in happyDict) {
@@ -64,7 +65,7 @@ function makeCountries(happyDict) {
   return countries
 }
 
-
+// We retrieve the other scores from the json file. Other scores meaning all the scores that contribute to the calculation of the Happiness Score
 function makeOtherScores(data){
   var otherScores = []
   for (score in data){
@@ -79,6 +80,9 @@ return otherScores
 
 function makeBars(countries, maxY, happyDict){
 
+
+    // Below, we create the bar chart and everything that is needed for it.
+    // We need scaleBand for the x-axis because we are working with categories in stead of integers, namely countries.
     var xScale = d3.scaleBand()
         .rangeRound([(margin.left + padding.left), width])
         .domain(countries)
@@ -103,6 +107,7 @@ function makeBars(countries, maxY, happyDict){
               var g = svg.append("g")
                   .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
+              // We create a new classes for the x- and y-axis.
               g.append("g")
                   .attr("class", "x axis")
                   .attr("transform", "translate(0," + height + ")")
@@ -120,6 +125,7 @@ function makeBars(countries, maxY, happyDict){
                   .attr("transform", "translate(" + (margin.left + padding.left) + ",0)")
                   .call(yAxis);
 
+              // We add names for the axes
               svg.append("text")
                   .attr("transform",
                         "translate(" + (width/2) + " ," +
@@ -135,6 +141,7 @@ function makeBars(countries, maxY, happyDict){
                   .style("text-anchor", "middle")
                   .text("Happiness Score");
 
+              // We add a title for the bar chart
               svg.append("text")
                   .attr("x", (width / 2))
                   .attr("y", 0 - (margin.top - 75))
@@ -143,6 +150,9 @@ function makeBars(countries, maxY, happyDict){
                   .style("text-decoration", "underline")
                   .text("Happiness score of different countries in the year 2017");
 
+
+              // We create a tooltip for the bar chart. We use d.value[6], because otherwise the tooltip will show ALL the values in stead of just the score.
+              // Also, if the user hovers over a bar with their mouse, the bar will change color.
               var tool_tip = d3.tip()
                 .attr("class", "d3-tip")
                 .offset([-8, 0])
@@ -185,7 +195,7 @@ var margin2 = {top: 20, right: 20, bottom: 20, left: 20},
     h = 500 - margin2.top - margin2.bottom,
     radius = w/2;
 
-
+  // Below, we make remove one donut chart if there is one, after that we create a new one based on which bar the user clicked.
   svg.selectAll(".bar")
      .data(otherScores)
      .on('click', function (d){
@@ -210,6 +220,7 @@ var margin2 = {top: 20, right: 20, bottom: 20, left: 20},
        .outerRadius(radius - 40)
        .innerRadius(radius - 40);
 
+   // We create the pie based on the amounts of the categories.
    var pie = d3.pie()
        .sort(null)
        .value(function(d) { return d.amount * 100; });
@@ -221,23 +232,23 @@ var margin2 = {top: 20, right: 20, bottom: 20, left: 20},
               .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
    var g = svg2.selectAll(".arc")
-            .data(pie(data))
-            .enter().append("g")
-            .attr("class", "arc")
+               .data(pie(data))
+               .enter().append("g")
+               .attr("class", "arc")
 
-            g.append("path")
-            .attr("d", arc)
-            .style("fill", function(d){
-              return color(d.data.category)
-            })
+              g.append("path")
+               .attr("d", arc)
+               .style("fill", function(d){
+                 return color(d.data.category)
+               })
 
-            g.append("text")
-          	 .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-          	 .text(function(d) { return d.data.amount.toFixed(2);})
-          	 .style("fill", "#fff")
-             .style("font-size", "0.70em")
+              g.append("text")
+            	 .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+            	 .text(function(d) { return d.data.amount.toFixed(2);})
+            	 .style("fill", "#fff")
+               .style("font-size", "0.70em")
 
-
+   // Below, we create the legend that will be placed in the center of the donut
    var legendG = svg2.selectAll(".legend")
                      .data(pie(data))
                      .enter().append("g")
@@ -246,20 +257,20 @@ var margin2 = {top: 20, right: 20, bottom: 20, left: 20},
                      })
                      .attr("class", "legend");
 
-   legendG.append("rect")
-     .attr("width", 10)
-     .attr("height", 10)
-     .attr("fill", function(d, i) {
-       return color(i);
-     });
+               legendG.append("rect")
+                      .attr("width", 10)
+                      .attr("height", 10)
+                      .attr("fill", function(d, i) {
+                        return color(i);
+                      });
 
-   legendG.append("text")
-     .text(function(d){
-       return d.data.category;
-     })
-     .style("font-size", 12)
-     .attr("y", 9)
-     .attr("x", 20);
+               legendG.append("text")
+                      .text(function(d){
+                        return d.data.category;
+                      })
+                      .style("font-size", 12)
+                      .attr("y", 9)
+                      .attr("x", 20);
 
 })
 }
